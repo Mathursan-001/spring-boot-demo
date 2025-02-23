@@ -1,8 +1,6 @@
 package com.game.demo.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Date;
@@ -18,11 +16,9 @@ public class Score {
     @GeneratedValue
     private Long id;
 
-    private final String userName;
-
-//    private final Integer wins;
-//
-//    private final Integer loses;
+    @ManyToOne
+    @JoinColumn(name = "user_id",nullable = false)
+    private AppUser user;
 
     private final Integer enteredNumber;
 

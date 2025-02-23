@@ -1,13 +1,14 @@
 package com.game.demo.repository;
 
 import com.game.demo.entity.AppUser;
-import com.game.demo.entity.Score;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Set;
+import java.util.Optional;
 
 
-public interface GameRepository extends JpaRepository<Score,Long> {
-   Set<Score> findByUser(AppUser user);
+public interface UserRepository extends JpaRepository<AppUser,Long> {
+
+    Optional<AppUser> findByUserName(String userName);
+
 }

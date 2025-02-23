@@ -1,10 +1,13 @@
 package com.game.demo.service;
 
 import com.game.demo.DTO.ScoreResponseDTO;
+import com.game.demo.entity.AppUser;
 import com.game.demo.entity.Score;
 import com.game.demo.repository.GameRepository;
+import com.game.demo.repository.UserRepository;
 import com.game.demo.util.GameUtil;
 import com.opencsv.CSVWriter;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,14 +24,17 @@ public class GameService {
 
     private final GameRepository gameRepository;
 
-    public ScoreResponseDTO getScoreResult(Integer value){
+    private final UserRepository userRepository;
+
+    @Transactional
+    public ScoreResponseDTO getScoreResult(Integer value,Long userId){
 
         Integer generatedNum = GameUtil.getRandom();
 
         gameRepository.save(
                 Score
                         .builder()
-                        .userName("USER")
+                        .user(userRepository.findById(userId).orElseThrow())
                         .generatedNumber(generatedNum)
                         .enteredNumber(value)
                         .attemptDateTime(new Date())
@@ -36,9 +42,21 @@ public class GameService {
 
         );
 
+        String result = GameUtil.getResult(value,generatedNum);
+
+        AppUser user = userRepository.findById(userId).orElseThrow();
+
+        if(result.equals("LOSE")){
+            user.setLoses(user.getLoses()+1);
+        }else{
+            user.setWins(user.getWins()+1);
+        }
+
+        userRepository.save(user);
+
         return ScoreResponseDTO
                 .builder()
-                .result(GameUtil.getResult(value,generatedNum))
+                .result(result)
                 .build();
 
     }
@@ -59,7 +77,7 @@ public class GameService {
 
             scores.forEach((score)->{
                 String[] record = {
-                        score.getUserName(),
+                        score.getUser().getUserName(),
                         score.getEnteredNumber().toString(),
                         score.getGeneratedNumber().toString(),
                         score.getAttemptDateTime().toString()

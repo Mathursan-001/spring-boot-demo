@@ -16,21 +16,18 @@ public class GameController {
 
     @GetMapping("/score")
     public ResponseEntity<ScoreResponseDTO> getGameResult(@RequestParam
-                                                              Integer num){
+                                                              Integer num,
+                                                          @RequestParam
+                                                          Long id){
         //validation
-        //
-        return ResponseEntity.ok(gameService.getScoreResult(num));
+        return ResponseEntity.ok(gameService.getScoreResult(num,id));
 
     }
 
     @GetMapping("/stats")
     public ResponseEntity<String> getStats(){
-        //validation
-        //
-
         gameService.writeStatFile();
         return ResponseEntity.accepted().body("Stat file generation begin");
-
     }
 
 
